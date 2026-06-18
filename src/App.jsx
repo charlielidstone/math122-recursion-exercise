@@ -133,7 +133,7 @@ function App() {
         </div>
       </section>
       <footer>
-        <p><a href="https://github.com/charlielidstone/math122-recursion-exercise/tree/master">View the code</a></p>
+        <p><a href="https://github.com/charlielidstone/math122-recursion-exercise/tree/master" target='_blank'>View the code</a></p>
       </footer>
     </>
   )
