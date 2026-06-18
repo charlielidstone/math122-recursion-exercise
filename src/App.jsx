@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import './App.css'
 import { solveGrid, generateRandomGrid, generateGrid } from './tromino';
+import minusSvg from './assets/minus.svg';
+import plusSvg from './assets/plus.svg';
+import refreshSvg from './assets/refresh.svg';
 
 function App() {
   const [grid, setGrid] = useState([
@@ -115,21 +118,21 @@ function App() {
         </div>
         
         <div className="grid-controls">
-          <button className="default-button" onClick={() => { cancelSolve(); if (N>1) setN(N-1); }}><img src="src/assets/minus.svg" alt="Decrease N" /></button>
-          <button className="default-button" onClick={() => { cancelSolve(); if (N<MAX_GRID_WIDTH) setN(N+1); }}><img src="src/assets/plus.svg" alt="Increase N" /></button>
-          <button className="default-button" onClick={() => { cancelSolve(); setGrid(generateRandomGrid(N)); }}><img src="src/assets/refresh.svg" alt="Refresh" /></button>
+          <button className="default-button" onClick={() => { cancelSolve(); if (N>1) setN(N-1); }}><img src={minusSvg} alt="Decrease N" /></button>
+          <button className="default-button" onClick={() => { cancelSolve(); if (N<MAX_GRID_WIDTH) setN(N+1); }}><img src={plusSvg} alt="Increase N" /></button>
+          <button className="default-button" onClick={() => { cancelSolve(); setGrid(generateRandomGrid(N)); }}><img src={refreshSvg} alt="Refresh" /></button>
           <button className="default-button choose-square-button" onClick={async () => {
             cancelSolve();
             areSelectingMissing ? setGrid(generateRandomGrid(N)) : setGrid(generateGrid(N)) ;
             setAreSelectingMissing(!areSelectingMissing);
-          }}><img src="src/assets/add.svg" alt="" />{areSelectingMissing ? 'Cancel' : 'Choose Square'}</button>
+          }}>{areSelectingMissing ? 'Cancel' : 'Choose Square'}</button>
           <button className="default-button solve-grid-button" onClick={async () => {
             cancelSolve();
             const signal = { cancelled: false };
             solveSignalRef.current = signal;
             await solveGrid(grid, N, setGrid, signal);
             if (solveSignalRef.current === signal) solveSignalRef.current = null;
-          }}><img src="src/assets/add.svg" alt="" />Solve Grid</button>
+          }}>Solve Grid</button>
         </div>
       </section>
       <footer>
