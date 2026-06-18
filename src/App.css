@@ -17,6 +17,11 @@
   cursor: pointer;
 }
 
+.solve-grid-button {
+  background: var(--accent);
+  color: rgb(39, 15, 63);
+}
+
 #center {
   display: flex;
   flex-direction: column;

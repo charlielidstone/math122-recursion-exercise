@@ -123,7 +123,7 @@ function App() {
             areSelectingMissing ? setGrid(generateRandomGrid(N)) : setGrid(generateGrid(N)) ;
             setAreSelectingMissing(!areSelectingMissing);
           }}><img src="src/assets/add.svg" alt="" />{areSelectingMissing ? 'Cancel' : 'Choose Square'}</button>
-          <button className="default-button" onClick={async () => {
+          <button className="default-button solve-grid-button" onClick={async () => {
             cancelSolve();
             const signal = { cancelled: false };
             solveSignalRef.current = signal;
