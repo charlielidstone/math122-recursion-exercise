@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import './App.css'
+import { solveGrid, generateRandomGrid } from './tromino';
 
 function App() {
   const [grid, setGrid] = useState([
@@ -8,105 +9,12 @@ function App() {
     [0, 0, 0, 0],
     [0, 0, 0, 0]
   ]);
-  const [gridWidth, setGridWidth] = useState(2);
-  const [totalLPieces, setTotalLPieces] = useState(1);
-  const MAX_GRID_WIDTH = 4;
+  const [N, setN] = useState(2);
+  const MAX_GRID_WIDTH = 6;
 
-  const generateGrid = (n) => {
-    n = 2**n;
-    
-    const newGrid = []
-
-    for (let i=0; i<n; i++) {
-      const row = [];
-      for (let j=0; j<n; j++) {
-        row.push(0);
-      }
-      newGrid.push(row);
-    }
-
-    if (n > 0) {
-      const randomIndex = Math.floor(Math.random() * (n*n));
-      const randomRow = Math.floor(randomIndex / n);
-      const randomCol = randomIndex % n;
-
-      newGrid[randomRow][randomCol] = -1;
-    }
-
-    return newGrid;
-  }
-
-  
-  const placeLShape = (grid, row, col, orientation) => {
-    const newGrid = [...grid];
-
-    const orientationOffsets = {
-      0: [[0, 0], [1, 0], [1, 1]],
-      1: [[0, 0], [0, 1], [1, 0]],
-      2: [[0, 0], [0, 1], [1, 1]],
-      3: [[0, 1], [1, 0], [1, 1]]
-    };
-
-    const offsets = orientationOffsets[orientation];
-
-    if (!offsets) {
-      console.error(`Invalid L-shape orientation: ${orientation}`);
-      return newGrid;
-    }
-
-    const canPlace = offsets.every(([rowOffset, colOffset]) => {
-      const targetRow = row + rowOffset;
-      const targetCol = col + colOffset;
-
-      if (targetRow < 0 || targetRow >= newGrid.length || targetCol < 0 || targetCol >= newGrid[targetRow].length) {
-        return false;
-      }
-
-      return newGrid[targetRow][targetCol] === 0;
-    });
-
-    if (!canPlace) {
-      console.error("Cannot place L-shape here!");
-      return newGrid;
-    }
-
-    offsets.forEach(([rowOffset, colOffset]) => {
-      newGrid[row + rowOffset][col + colOffset] = totalLPieces;
-    });
-
-    setTotalLPieces((prev) => prev + 1);
-        
-    return newGrid;
-  }
-
-  const populateGridWithLPieces = (grid) => {
-    const newGrid = [...grid];
-    let lPiecesPlaced = 0;
-
-    for (let row=0; row<newGrid.length; row++) {
-      for (let col=0; col<newGrid[row].length; col++) {
-        if (newGrid[row][col] === 0) {
-          const canPlaceLShape = row+1 < newGrid.length && col+1 < newGrid[row].length &&
-            newGrid[row][col] === 0 &&
-            newGrid[row][col+1] === 0 &&
-            newGrid[row+1][col] === 0;
-
-          if (canPlaceLShape) {
-            placeLShape(newGrid, row, col, Math.floor(Math.random() * 4));
-            lPiecesPlaced++;
-          }
-        }
-      }
-    }
-
-    console.log(`Total L-pieces placed: ${lPiecesPlaced}`);
-    
-    return newGrid;
-  }
-  
   useEffect(() => {
-    setGrid(generateGrid(gridWidth));
-  }, [gridWidth]);
+    setGrid(generateRandomGrid(N));
+  }, [N]);
 
   const renderedLPieces = useMemo(() => {
     const piecesById = new Map();
@@ -184,7 +92,7 @@ function App() {
                   is-the-square={col}
                   className="grid-sub-square"
                 >
-                  {/* <div className="L-piece-centre"></div> */}
+                  {/* {rowIndex}, {colIndex} */}
                 </div>
               );
             });
@@ -192,13 +100,12 @@ function App() {
         </div>
         
         <div className="grid-controls">
-          <button className="default-button" onClick={() => {if (gridWidth>1) setGridWidth(gridWidth-1)}}><img src="src/assets/minus.svg" alt="" /></button>
-          <button className="default-button" onClick={() => {if (gridWidth<MAX_GRID_WIDTH) setGridWidth(gridWidth+1)}}><img src="src/assets/plus.svg" alt="" /></button>
-          <button className="default-button" onClick={() => {setGrid(generateGrid(gridWidth))}}><img src="src/assets/refresh.svg" alt="" /></button>
+          <button className="default-button" onClick={() => {if (N>1) setN(N-1)}}><img src="src/assets/minus.svg" alt="" /></button>
+          <button className="default-button" onClick={() => {if (N<MAX_GRID_WIDTH) setN(N+1)}}><img src="src/assets/plus.svg" alt="" /></button>
+          <button className="default-button" onClick={() => {setGrid(generateRandomGrid(N))}}><img src="src/assets/refresh.svg" alt="" /></button>
           <button className="default-button" onClick={() => {
-            setGrid(placeLShape(grid, 0, 0, 3));
-            console.log(grid);
-          }}><img src="src/assets/add.svg" alt="" /></button>
+            setGrid(solveGrid(grid, N));
+          }}><img src="src/assets/add.svg" alt="" />Solve Grid</button>
         </div>
       </section>
     </>
