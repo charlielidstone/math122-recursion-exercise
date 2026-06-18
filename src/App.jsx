@@ -123,6 +123,9 @@ function App() {
           }}><img src="src/assets/add.svg" alt="" />Solve Grid</button>
         </div>
       </section>
+      <footer>
+        <p><a href="https://github.com/charlielidstone/math122-recursion-exercise/tree/master">View the code</a></p>
+      </footer>
     </>
   )
 }
