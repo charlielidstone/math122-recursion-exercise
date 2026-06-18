@@ -103,8 +103,8 @@ function App() {
           <button className="default-button" onClick={() => {if (N>1) setN(N-1)}}><img src="src/assets/minus.svg" alt="" /></button>
           <button className="default-button" onClick={() => {if (N<MAX_GRID_WIDTH) setN(N+1)}}><img src="src/assets/plus.svg" alt="" /></button>
           <button className="default-button" onClick={() => {setGrid(generateRandomGrid(N))}}><img src="src/assets/refresh.svg" alt="" /></button>
-          <button className="default-button" onClick={() => {
-            setGrid(solveGrid(grid, N));
+          <button className="default-button" onClick={async () => {
+            await solveGrid(grid, N, setGrid);
           }}><img src="src/assets/add.svg" alt="" />Solve Grid</button>
         </div>
       </section>

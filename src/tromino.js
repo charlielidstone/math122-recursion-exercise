@@ -65,18 +65,31 @@ function generateRandomGrid(N) {
 }
 
 // The Magic -----------------------------------------------------------------------------------
-function solveGrid(grid, N) {
-    return fillGrid(N, ...findMissingSquare(grid));
+const DELAY_MS = 400;
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }, missingValue = -1) {
-    var grid = generateGrid(N);
-    grid[missingRow][missingCol] = missingValue;
+async function solveGrid(grid, N, setGrid = null) {
+    return fillGrid(N, ...findMissingSquare(grid), { current: 1 }, -1, null, 0, 0, setGrid);
+}
+
+async function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }, missingValue = -1, rootGrid = null, rowOffset = 0, colOffset = 0, setGrid = null) {
+    if (rootGrid === null) {
+        rootGrid = generateGrid(N);
+    }
+
+    rootGrid[rowOffset + missingRow][colOffset + missingCol] = missingValue;
 
     if (N == 1) {
         const orientation = pairToQuadrant(missingRow, missingCol);
         console.log("orientation: ", orientation);
-        grid = placeLShape(grid, 0, 0, orientation, pieceCounter.current++);
+        placeLShape(rootGrid, rowOffset, colOffset, orientation, pieceCounter.current++);
+        if (setGrid) {
+            setGrid(rootGrid.map(r => [...r]));
+            await sleep(DELAY_MS);
+        }
     } else {
         const subSize = 2**(N-1);
         const missingSquareSubRow = Math.floor(missingRow/subSize);
@@ -86,26 +99,27 @@ function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }, miss
         console.log("missingSquareQuadrant: ", missingSquareQuadrant);
         console.log("subSize: ", subSize);
 
-        const missingSquareSubGrid = fillGrid(N-1, (missingRow % subSize), (missingCol % subSize), pieceCounter, missingValue);
-        mergeGrids(grid, missingSquareSubGrid, missingSquareQuadrant);
+        const [mQRow, mQCol] = quadrantToPair(missingSquareQuadrant);
+        await fillGrid(N-1, missingRow % subSize, missingCol % subSize, pieceCounter, missingValue, rootGrid, rowOffset + mQRow * subSize, colOffset + mQCol * subSize, setGrid);
 
         const centreId = pieceCounter.current++;
-        placeLShape(grid, subSize-1, subSize-1, missingSquareQuadrant, centreId);
+        placeLShape(rootGrid, rowOffset + subSize - 1, colOffset + subSize - 1, missingSquareQuadrant, centreId);
+        if (setGrid) {
+            setGrid(rootGrid.map(r => [...r]));
+            await sleep(DELAY_MS);
+        }
 
-        for (var i=0; i<4; i++) {
+        for (var i = 0; i < 4; i++) {
             if (i !== missingSquareQuadrant) {
                 const [qRow, qCol] = quadrantToPair(i);
                 const innerRow = qRow === 0 ? subSize - 1 : 0;
                 const innerCol = qCol === 0 ? subSize - 1 : 0;
-                const subGrid = fillGrid(N-1, innerRow, innerCol, pieceCounter, centreId);
-                mergeGrids(grid, subGrid, i);
+                await fillGrid(N-1, innerRow, innerCol, pieceCounter, centreId, rootGrid, rowOffset + qRow * subSize, colOffset + qCol * subSize, setGrid);
             }
         }
-
-
     }
 
-    return grid;
+    return rootGrid;
 }
 
 function mergeGrids(grid, subGrid, quadrant) {
