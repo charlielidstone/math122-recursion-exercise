@@ -31,29 +31,47 @@
   }
 }
 
-.grid-container {
-  position: relative;
-  width: min(500px, 90vw);
+.grid {
   aspect-ratio: 1 / 1;
-  border: 1px solid var(--accent-border);
   display: grid;
   grid-template-columns: repeat(var(--grid-size), 1fr);
   grid-template-rows: repeat(var(--grid-size), 1fr);
+}
+
+.grid-container {
+  position: relative;
+  width: min(500px, 90vw);
+  border: 1px solid var(--accent-border);
 }
 
 .grid-sub-square {
   border: 1px solid var(--accent-border);
   min-width: 0;
   min-height: 0;
-  display: grid;
-  place-items: center;
+  position: relative;
+  pointer-events: none;
 }
 
-.grid-sub-square[is-the-square="1"] {
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.grid-L-piece {
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  background-color: var(--accent);
+  /* clip-path: polygon(0 0, 100% 0, 100% 50%, 50% 50%, 50% 100%, 0 100%); */
+  /* clip-path: polygon(5% 5%, 95% 5%, 95% 45%, 45% 45%, 45% 95%, 5% 95%); */
+  clip-path: polygon(2% 2%, 98% 2%, 98% 48%, 48% 48%, 48% 98%, 2% 98%);
+}
+
+.grid-sub-square[is-the-square="-1"] {
   background-color: var(--accent-bg);
 }
 
-.grid-size-controls {
+.grid-controls {
   margin-top: 3rem;
   display: flex;
   gap: 1em;
@@ -61,7 +79,7 @@
   align-items: center;
 }
 
-.grid-size-controls .default-button img {
+.grid-controls .default-button img {
   position: relative;
   top: 1px;
 }
