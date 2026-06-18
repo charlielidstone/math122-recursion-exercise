@@ -38,7 +38,7 @@ function placeLShape(grid, row, col, orientation, pieceId) {
     return newGrid;
 }
 
-function generateGrid(N) {
+function generateGrid(N, missingRow = null, missingCol = null) {
     N = 2**N;
     
     const newGrid = []
@@ -49,6 +49,10 @@ function generateGrid(N) {
         row.push(0);
       }
       newGrid.push(row);
+    }
+
+    if (missingRow !== null && missingCol !== null) {
+        newGrid[missingRow][missingCol] = -1;
     }
 
     return newGrid;
@@ -94,7 +98,6 @@ async function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }
 
     if (N == 1) {
         const orientation = pairToQuadrant(missingRow, missingCol);
-        console.log("orientation: ", orientation);
         placeLShape(rootGrid, rowOffset, colOffset, orientation, pieceCounter.current++);
         if (setGrid) {
             setGrid(rootGrid.map(r => [...r]));
@@ -105,9 +108,6 @@ async function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }
         const missingSquareSubRow = Math.floor(missingRow/subSize);
         const missingSquareSubCol = Math.floor(missingCol/subSize);
         const missingSquareQuadrant = pairToQuadrant(missingSquareSubRow, missingSquareSubCol);
-
-        console.log("missingSquareQuadrant: ", missingSquareQuadrant);
-        console.log("subSize: ", subSize);
 
         const [mQRow, mQCol] = quadrantToPair(missingSquareQuadrant);
         await fillGrid(N-1, missingRow % subSize, missingCol % subSize, pieceCounter, missingValue, rootGrid, rowOffset + mQRow * subSize, colOffset + mQCol * subSize, setGrid, signal);

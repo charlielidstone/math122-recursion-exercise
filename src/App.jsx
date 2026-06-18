@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import './App.css'
-import { solveGrid, generateRandomGrid } from './tromino';
+import { solveGrid, generateRandomGrid, generateGrid } from './tromino';
 
 function App() {
   const [grid, setGrid] = useState([
@@ -81,9 +81,27 @@ function App() {
           className="grid grid-container"
           style={{ '--grid-size': grid.length }}
         >
+          {grid.map((row, rowIndex) => {
+            return row.map((col, colIndex) => {
+              return (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  data-is-the-square={col}
+                  data-are-selecting-missing={areSelectingMissing}
+                  className="grid-sub-square"
+                  onClick={() => {
+                    setAreSelectingMissing(false);
+                    setGrid(generateGrid(N, rowIndex, colIndex));
+                  }}
+                >
+                  {/* {rowIndex}, {colIndex} */}
+                </div>
+              );
+            });
+          })}
           <div className="grid grid-overlay">
             {renderedLPieces.map((piece) => {
-              return <div 
+              return <div
                 key={piece.id}
                 className="grid-L-piece"
                 style={{
@@ -94,26 +112,17 @@ function App() {
               ></div>
             })}
           </div>
-          {grid.map((row, rowIndex) => {
-            return row.map((col, colIndex) => {
-              return (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  is-the-square={col}
-                  data-are-selecting-missing={areSelectingMissing}
-                  className="grid-sub-square"
-                >
-                  {/* {rowIndex}, {colIndex} */}
-                </div>
-              );
-            });
-          })}
         </div>
         
         <div className="grid-controls">
           <button className="default-button" onClick={() => { cancelSolve(); if (N>1) setN(N-1); }}><img src="src/assets/minus.svg" alt="" /></button>
           <button className="default-button" onClick={() => { cancelSolve(); if (N<MAX_GRID_WIDTH) setN(N+1); }}><img src="src/assets/plus.svg" alt="" /></button>
           <button className="default-button" onClick={() => { cancelSolve(); setGrid(generateRandomGrid(N)); }}><img src="src/assets/refresh.svg" alt="" /></button>
+          <button className="default-button" onClick={async () => {
+            cancelSolve();
+            areSelectingMissing ? setGrid(generateRandomGrid(N)) : setGrid(generateGrid(N)) ;
+            setAreSelectingMissing(!areSelectingMissing);
+          }}><img src="src/assets/add.svg" alt="" />{areSelectingMissing ? 'Cancel' : 'Choose Square'}</button>
           <button className="default-button" onClick={async () => {
             cancelSolve();
             const signal = { cancelled: false };

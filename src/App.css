@@ -49,17 +49,16 @@
   min-width: 0;
   min-height: 0;
   position: relative;
-  pointer-events: none;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 0.8em;
-  z-index: -1;
 }
 
 .grid-overlay {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
 .grid-L-piece {
@@ -72,7 +71,7 @@
   clip-path: polygon(2% 2%, 98% 2%, 98% 48%, 48% 48%, 48% 98%, 2% 98%);
 }
 
-.grid-sub-square[is-the-square="-1"] {
+.grid-sub-square[data-is-the-square="-1"], .grid-sub-square[data-are-selecting-missing="true"]:hover {
   background-color: var(--accent-bg);
 }
 
