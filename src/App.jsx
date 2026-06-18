@@ -115,9 +115,9 @@ function App() {
         </div>
         
         <div className="grid-controls">
-          <button className="default-button" onClick={() => { cancelSolve(); if (N>1) setN(N-1); }}><img src="src/assets/minus.svg" alt="" /></button>
-          <button className="default-button" onClick={() => { cancelSolve(); if (N<MAX_GRID_WIDTH) setN(N+1); }}><img src="src/assets/plus.svg" alt="" /></button>
-          <button className="default-button" onClick={() => { cancelSolve(); setGrid(generateRandomGrid(N)); }}><img src="src/assets/refresh.svg" alt="" /></button>
+          <button className="default-button" onClick={() => { cancelSolve(); if (N>1) setN(N-1); }}><img src="src/assets/minus.svg" alt="Decrease N" /></button>
+          <button className="default-button" onClick={() => { cancelSolve(); if (N<MAX_GRID_WIDTH) setN(N+1); }}><img src="src/assets/plus.svg" alt="Increase N" /></button>
+          <button className="default-button" onClick={() => { cancelSolve(); setGrid(generateRandomGrid(N)); }}><img src="src/assets/refresh.svg" alt="Refresh" /></button>
           <button className="default-button" onClick={async () => {
             cancelSolve();
             areSelectingMissing ? setGrid(generateRandomGrid(N)) : setGrid(generateGrid(N)) ;
