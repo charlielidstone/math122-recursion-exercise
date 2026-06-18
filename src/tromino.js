@@ -83,6 +83,7 @@ function sleep(ms, signal = null) {
     });
 }
 
+// The base recursion funciton, which calls the recursive fillGrid()
 async function solveGrid(grid, N, setGrid = null, signal = null) {
     return fillGrid(N, ...findMissingSquare(grid), { current: 1 }, -1, null, 0, 0, setGrid, signal);
 }
@@ -96,7 +97,9 @@ async function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }
 
     rootGrid[rowOffset + missingRow][colOffset + missingCol] = missingValue;
 
+    // The Base Case: N = 1, so we add the single L piece where it needs to go
     if (N == 1) {
+        // We rotate the piece to fit. The orientation is either 0 (for 0deg), 1 (for 90deg), 2 (for 180deg), or 3 (for 270deg), and corresponds to quadrant 0, 1, 2, or 3
         const orientation = pairToQuadrant(missingRow, missingCol);
         placeLShape(rootGrid, rowOffset, colOffset, orientation, pieceCounter.current++);
         if (setGrid) {
@@ -104,16 +107,21 @@ async function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }
             await sleep(DELAY_MS, signal);
         }
     } else {
+        // We subdivide the grid into four quandrants. So if N = 4, 2^N = 16, then each quadrant is 8x8
         const subSize = 2**(N-1);
+        // Convert the missing piece coordinates to work with the subdivided grid
         const missingSquareSubRow = Math.floor(missingRow/subSize);
         const missingSquareSubCol = Math.floor(missingCol/subSize);
+        // We detemine the quadrant that the missing square is in, so that we dont fill that quadrant twice
         const missingSquareQuadrant = pairToQuadrant(missingSquareSubRow, missingSquareSubCol);
 
+        // We fill the quadrant with the missing square. This is where the main recursion takes place. 
         const [mQRow, mQCol] = quadrantToPair(missingSquareQuadrant);
         await fillGrid(N-1, missingRow % subSize, missingCol % subSize, pieceCounter, missingValue, rootGrid, rowOffset + mQRow * subSize, colOffset + mQCol * subSize, setGrid, signal);
 
         if (signal?.cancelled) return rootGrid;
 
+        // We place an L piece in the centre so that the remaining quadrants have a missing square
         const centreId = pieceCounter.current++;
         placeLShape(rootGrid, rowOffset + subSize - 1, colOffset + subSize - 1, missingSquareQuadrant, centreId);
         if (setGrid) {
@@ -121,6 +129,7 @@ async function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }
             await sleep(DELAY_MS, signal);
         }
 
+        // We fill the remaining three quadrants
         for (var i = 0; i < 4; i++) {
             if (i !== missingSquareQuadrant) {
                 if (signal?.cancelled) return rootGrid;
@@ -138,10 +147,10 @@ async function fillGrid(N, missingRow, missingCol, pieceCounter = { current: 1 }
 function mergeGrids(grid, subGrid, quadrant) {
     const subSize = subGrid.length;
     const quadrantOffsets = [
-        [0,       0      ],  // 0: top-left
-        [0,       subSize],  // 1: top-right
-        [subSize, subSize],  // 2: bottom-right
-        [subSize, 0      ],  // 3: bottom-left
+        [0,       0      ],
+        [0,       subSize],
+        [subSize, subSize],
+        [subSize, 0      ],
     ];
     const [rowOffset, colOffset] = quadrantOffsets[quadrant];
 
