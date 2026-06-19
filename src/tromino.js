@@ -69,7 +69,7 @@ function generateRandomGrid(N) {
 }
 
 // The Magic -----------------------------------------------------------------------------------
-const DELAY_MS = 100;
+const DELAY_MS = 50;
 
 function sleep(ms, signal = null) {
     return new Promise(resolve => {
